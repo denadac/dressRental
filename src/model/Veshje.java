@@ -39,6 +39,10 @@ public abstract class Veshje implements Serializable {
         return cmimiQirasePerDite;
     }
 
+    public int getVeshjaId() {
+        return veshjaId;
+    }
+
     @Override
     public String toString() {
         return "ID: " + veshjaId + ", Emri: " + emri + ", Lloji: " + lloji + ", Madhësia: " + madhesia + ", Çmimi: " + cmimiQirasePerDite + "€/dita" +

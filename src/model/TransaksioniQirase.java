@@ -16,4 +16,13 @@ public class TransaksioniQirase {
         this.dataFillimit = dataFillimit;
         this.dataMbarimit = dataMbarimit;
     }
+
+
+    public LocalDate getDataFillimit() {
+        return dataFillimit;
+    }
+
+    public LocalDate getDataMbarimit() {
+        return dataMbarimit;
+    }
 }

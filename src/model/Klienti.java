@@ -9,6 +9,7 @@ public class Klienti implements Serializable {
     private String kontakt;
     private boolean activeRental;
     private int rentedVeshjeId; // ID of the rented Veshje if applicable
+    private TransaksioniQirase activeRentalTransaction;
 
     public Klienti(int id, String emri, String kontakt) {
         this.id = id;
@@ -16,6 +17,7 @@ public class Klienti implements Serializable {
         this.kontakt = kontakt;
         this.activeRental = false;
         this.rentedVeshjeId = -1; // Default to -1 indicating no active rental
+        this.activeRentalTransaction = null;
     }
 
     // Getters
@@ -48,5 +50,13 @@ public class Klienti implements Serializable {
     public void clearRental() {
         this.activeRental = false;
         this.rentedVeshjeId = -1;
+    }
+
+    public TransaksioniQirase getActiveRentalTransaction() {
+        return activeRentalTransaction;
+    }
+
+    public void setActiveRentalTransaction(TransaksioniQirase transaction) {
+        this.activeRentalTransaction = transaction;
     }
 }
