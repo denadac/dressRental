@@ -16,7 +16,7 @@ public class MainFrame extends JFrame {
 
         add(tabbedPane);
         setTitle("Sistemi i Qirasë së Veshjeve");
-        setSize(800, 600);
+        setSize(1200, 800);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
     }

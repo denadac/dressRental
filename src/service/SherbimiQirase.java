@@ -121,10 +121,6 @@ public class SherbimiQirase {
         return null;
     }
 
-    public void fshiVeshje(int veshjaId) {
-        veshjet.removeIf(veshje -> veshje.getVeshjaId() == veshjaId);
-    }
-
     public void updateVeshje(Veshje updatedVeshje) {
         for (int i = 0; i < veshjet.size(); i++) {
             if (veshjet.get(i).getVeshjaId() == updatedVeshje.getVeshjaId()) {
@@ -132,6 +128,12 @@ public class SherbimiQirase {
                 break;
             }
         }
+        MenaxhuesiSkedareve.ruajVeshje(veshjet); // Save the updated list to the file
+    }
+
+    public void fshiVeshje(int veshjaId) {
+        veshjet.removeIf(veshje -> veshje.getVeshjaId() == veshjaId);
+        MenaxhuesiSkedareve.ruajVeshje(veshjet); // Save the updated list to the file
     }
 
     public void shtoQira(int klientId, int veshjeId, LocalDate dataFillimit, LocalDate dataMbarimit, boolean paguar) {

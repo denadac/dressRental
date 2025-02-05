@@ -46,32 +46,34 @@ public class VeshjePanel extends JPanel {
     }
 
     private void loadVeshje(List<Veshje> veshjet) {
-        String[] columnNames = {"ID", "Emri", "Çmimi", "Ngjyra", "Materiali", "Gjatësia", "E Disponueshme", "Modifiko", "Fshi"};
-        Object[][] data = new Object[veshjet.size()][9];
+        String[] columnNames = {"ID", "Lloji" ,"Emri", "Çmimi", "Ngjyra", "Materiali", "Gjatësia",  "Masa" , "E Disponueshme", "Modifiko", "Fshi"};
+        Object[][] data = new Object[veshjet.size()][11];
 
         for (int i = 0; i < veshjet.size(); i++) {
             Veshje veshje = veshjet.get(i);
             data[i][0] = veshje.getVeshjaId();
-            data[i][1] = veshje.getEmri();
-            data[i][2] = veshje.getCmimiQirasePerDite();
-            data[i][3] = veshje instanceof Kostum ? ((Kostum) veshje).getNgjyra() : "";
-            data[i][4] = veshje instanceof FustanNuserie ? ((FustanNuserie) veshje).getMateriali() : "";
-            data[i][5] = veshje instanceof FustanEventi ? ((FustanEventi) veshje).getGjatesia() : "";
-            data[i][6] = veshje.eshteEDisponueshme() ? "Po" : "Jo";
-            data[i][7] = "Modifiko";
-            data[i][8] = "Fshi";
+            data[i][1] = veshje.getLloji();
+            data[i][2] = veshje.getEmri();
+            data[i][3] = veshje.getCmimiQirasePerDite();
+            data[i][4] = veshje instanceof Kostum ? ((Kostum) veshje).getNgjyra() : "";
+            data[i][5] = veshje instanceof FustanNuserie ? ((FustanNuserie) veshje).getMateriali() : "";
+            data[i][6] = veshje instanceof FustanEventi ? ((FustanEventi) veshje).getGjatesia() : "";
+            data[i][7] = veshje.getMadhesia();
+            data[i][8] = veshje.eshteEDisponueshme() ? "Po" : "Jo";
+            data[i][9] = "Modifiko";
+            data[i][10] = "Fshi";
         }
 
         veshjeTable.setModel(new javax.swing.table.DefaultTableModel(data, columnNames) {
             public boolean isCellEditable(int row, int column) {
-                return column == 7 || column == 8;
+                return column == 9 || column == 10;
             }
         });
 
-        veshjeTable.getColumnModel().getColumn(7).setCellRenderer(new ButtonRenderer());
-        veshjeTable.getColumnModel().getColumn(7).setCellEditor(new ButtonEditor(new JCheckBox(), row -> modifyVeshje(row)));
-        veshjeTable.getColumnModel().getColumn(8).setCellRenderer(new ButtonRenderer());
-        veshjeTable.getColumnModel().getColumn(8).setCellEditor(new ButtonEditor(new JCheckBox(), this::deleteVeshje));
+        veshjeTable.getColumnModel().getColumn(9).setCellRenderer(new ButtonRenderer());
+        veshjeTable.getColumnModel().getColumn(9).setCellEditor(new ButtonEditor(new JCheckBox(), row -> modifyVeshje(row)));
+        veshjeTable.getColumnModel().getColumn(10).setCellRenderer(new ButtonRenderer());
+        veshjeTable.getColumnModel().getColumn(10).setCellEditor(new ButtonEditor(new JCheckBox(), this::deleteVeshje));
     }
 
     private void searchVeshje(ActionEvent e) {
@@ -88,6 +90,7 @@ public class VeshjePanel extends JPanel {
 
         if (veshje != null) {
             String newEmri = JOptionPane.showInputDialog(this, "Ndrysho Emrin", veshje.getEmri());
+            String newMadhesia = JOptionPane.showInputDialog(this, "Ndrysho Masen", veshje.getMadhesia());
             double newCmimi = Double.parseDouble(JOptionPane.showInputDialog(this, "Ndrysho Çmimin", veshje.getCmimiQirasePerDite()));
             boolean eDisponueshme = JOptionPane.showConfirmDialog(this, "A është e disponueshme?", "Disponueshmëria", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION;
 
@@ -103,6 +106,7 @@ public class VeshjePanel extends JPanel {
             }
 
             veshje.setEmri(newEmri);
+            veshje.setMadhesia(newMadhesia);
             veshje.setCmimiQirasePerDite(newCmimi);
             veshje.setEDisponueshme(eDisponueshme);
 
