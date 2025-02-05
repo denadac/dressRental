@@ -10,7 +10,9 @@ public class MainFrame extends JFrame {
         JTabbedPane tabbedPane = new JTabbedPane();
 
         tabbedPane.addTab("Administrator", new AdminPanel(sherbimi));
+        tabbedPane.addTab("Veshjet", new VeshjePanel(sherbimi));
         tabbedPane.addTab("Klienti", new ClientPanel(sherbimi));
+
 
         add(tabbedPane);
         setTitle("Sistemi i Qirasë së Veshjeve");

@@ -11,4 +11,12 @@ public class FustanNuserie extends Veshje implements Serializable {
         super(veshjaId, emri, "Fustan Nuserie", madhesia, cmimiQirasePerDite);
         this.materiali = materiali;
     }
+
+    public Object getMateriali() {
+        return materiali;
+    }
+
+    public void setMateriali(String newMateriali) {
+        materiali = newMateriali;
+    }
 }

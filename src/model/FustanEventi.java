@@ -9,4 +9,12 @@ public class FustanEventi extends Veshje  implements Serializable{
         super(veshjaId, emri, "Fustan Eventi", madhesia, cmimiQirasePerDite);
         this.gjatesia = gjatesia;
     }
+
+    public Object getGjatesia() {
+        return gjatesia;
+    }
+
+    public void setGjatesia(String newGjatesia) {
+        gjatesia = newGjatesia;
+    }
 }

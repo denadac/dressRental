@@ -10,4 +10,12 @@ public class Kostum extends Veshje implements Serializable {
         super(veshjaId, emri, "Kostum", madhesia, cmimiQirasePerDite);
         this.ngjyra = ngjyra;
     }
+
+    public Object getNgjyra() {
+        return ngjyra;
+    }
+
+    public void setNgjyra(String newNgjyra) {
+        ngjyra = newNgjyra;
+    }
 }

@@ -101,17 +101,28 @@ public class AdminPanel extends JPanel {
     private void shtoVeshje() {
         try {
             String emri = emriField.getText().trim();
-            double cmimi = Double.parseDouble(cmimiField.getText().trim());
-            String madhesia = (String) madhesiaDropdown.getSelectedItem();
-            int veshjaId = Integer.parseInt(veshjaIdField.getText().trim()); // Get the veshjaId
-
             if (emri.isEmpty()) {
                 JOptionPane.showMessageDialog(this, "Emri nuk mund të jetë bosh!", "Gabim", JOptionPane.ERROR_MESSAGE);
                 return;
             }
 
-            Veshje veshje = null;
+            String cmimiText = cmimiField.getText().trim();
+            if (cmimiText.isEmpty() || !cmimiText.matches("\\d+(\\.\\d+)?")) {
+                JOptionPane.showMessageDialog(this, "Cmimi duhet të jetë numër!", "Gabim", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            double cmimi = Double.parseDouble(cmimiText);
+
+            String veshjaIdText = veshjaIdField.getText().trim();
+            if (veshjaIdText.isEmpty() || !veshjaIdText.matches("\\d+")) {
+                JOptionPane.showMessageDialog(this, "Veshja ID duhet të jetë numër!", "Gabim", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            int veshjaId = Integer.parseInt(veshjaIdText);
+
+            String madhesia = (String) madhesiaDropdown.getSelectedItem();
             String selectedType = (String) veshjeTypeDropdown.getSelectedItem();
+            Veshje veshje = null;
 
             if ("Fustan Nuserie".equals(selectedType)) {
                 String materiali = materialiField.getText().trim();
@@ -139,6 +150,7 @@ public class AdminPanel extends JPanel {
             JOptionPane.showMessageDialog(this, "Cmimi duhet të jetë numër dhe Veshja ID duhet të jetë numër!", "Gabim", JOptionPane.ERROR_MESSAGE);
         }
     }
+
 
     private void shfaqVeshjet() {
         List<Veshje> veshjet = sherbimi.getTeGjithaVeshjet();

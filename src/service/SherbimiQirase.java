@@ -120,4 +120,34 @@ public class SherbimiQirase {
         }
         return null;
     }
+
+    public void fshiVeshje(int veshjaId) {
+        veshjet.removeIf(veshje -> veshje.getVeshjaId() == veshjaId);
+    }
+
+    public void updateVeshje(Veshje updatedVeshje) {
+        for (int i = 0; i < veshjet.size(); i++) {
+            if (veshjet.get(i).getVeshjaId() == updatedVeshje.getVeshjaId()) {
+                veshjet.set(i, updatedVeshje);
+                break;
+            }
+        }
+    }
+
+    public void shtoQira(int klientId, int veshjeId, LocalDate dataFillimit, LocalDate dataMbarimit, boolean paguar) {
+        Klienti klient = getKlientById(klientId);
+        Veshje veshje = getVeshjeById(veshjeId);
+        if (klient != null && veshje != null && veshje.eshteEDisponueshme()) {
+            TransaksioniQirase transaction = new TransaksioniQirase(1, veshje, klient, dataFillimit, dataMbarimit);
+            klient.setActiveRental(true, veshjeId);
+            klient.setActiveRentalTransaction(transaction);
+            veshje.merreMeQira();
+
+            // If the rental is paid, handle payment logic here
+            if (paguar) {
+                paguajQira(klientId);
+            }
+        }
+    }
+
 }

@@ -1,7 +1,6 @@
 package ui;
 
-import model.Klienti;
-import model.Veshje;
+import model.*;
 import service.SherbimiQirase;
 
 import javax.swing.*;
@@ -9,10 +8,15 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.function.Consumer;
 
 public class ClientPanel extends JPanel {
     private SherbimiQirase sherbimi;
+    private JTable veshjeTable;
+    private DefaultTableModel tableModel;
 
     public ClientPanel(SherbimiQirase sherbimi) {
         this.sherbimi = sherbimi;
@@ -22,40 +26,50 @@ public class ClientPanel extends JPanel {
         JButton shikoVeshjeBtn = new JButton("Shiko Veshjet Disponueshme");
         shikoVeshjeBtn.addActionListener(this::showVeshjetDetails);
 
-        JButton perditesoKlientetBtn = new JButton("Përditëso Klientët");
-        perditesoKlientetBtn.addActionListener(this::updateClientTable);
+        JButton updateButton = new JButton("Përditëso Tabelën");
+        updateButton.addActionListener(e -> loadVeshje(sherbimi.getTeGjithaVeshjet()));
 
         // Create top panel for the buttons
         JPanel topPanel = new JPanel();
         topPanel.add(shikoVeshjeBtn);
-        topPanel.add(perditesoKlientetBtn);  // Add the update button next to the existing one
+        topPanel.add(updateButton);  // Add the update button
         add(topPanel, BorderLayout.NORTH);
 
-        // Create the table for Klient list
-        JTable klientTable = new JTable();
-        DefaultTableModel tableModel = new DefaultTableModel(new Object[]{
-                "Klient ID", "Emri", "Kontakt", "Ka Qira Aktive", "Shiko Detajet", "Shto Qera", "Paguaj Qera", "Mbyll Qerane"
+        // Create the table for Veshje list
+        veshjeTable = new JTable();
+        tableModel = new DefaultTableModel(new Object[]{
+                "ID", "Emri", "Çmimi", "Ngjyra", "Materiali", "Gjatësia", "E Disponueshme", "Rezervo"
         }, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
-                return column >= 4; // Only buttons are editable
+                return column == 7; // Only the "Rezervo" button is editable
             }
         };
 
-        klientTable.setModel(tableModel);
-        klientTable.getColumn("Shiko Detajet").setCellRenderer(new ButtonRenderer());
-        klientTable.getColumn("Shiko Detajet").setCellEditor(new ButtonEditor(new JButton("Shiko Detajet")));
-        klientTable.getColumn("Shto Qera").setCellRenderer(new ButtonRenderer());
-        klientTable.getColumn("Shto Qera").setCellEditor(new ButtonEditor(new JButton("Shto Qera")));
-        klientTable.getColumn("Paguaj Qera").setCellRenderer(new ButtonRenderer());
-        klientTable.getColumn("Paguaj Qera").setCellEditor(new ButtonEditor(new JButton("Paguaj Qera")));
-        klientTable.getColumn("Mbyll Qerane").setCellRenderer(new ButtonRenderer());
-        klientTable.getColumn("Mbyll Qerane").setCellEditor(new ButtonEditor(new JButton("Mbyll Qerane")));
+        veshjeTable.setModel(tableModel);
+        veshjeTable.getColumn("Rezervo").setCellRenderer(new ButtonRenderer());
+        veshjeTable.getColumn("Rezervo").setCellEditor(new ButtonEditor(new JCheckBox(), this::rezervoVeshje));
 
-        add(new JScrollPane(klientTable), BorderLayout.CENTER);
+        add(new JScrollPane(veshjeTable), BorderLayout.CENTER);
 
         // Initially populate the table
-        populateKlientTable(tableModel);
+        loadVeshje(sherbimi.getTeGjithaVeshjet());
+    }
+
+    private void loadVeshje(List<Veshje> veshjet) {
+        tableModel.setRowCount(0); // Clear the table
+        for (Veshje veshje : veshjet) {
+            tableModel.addRow(new Object[]{
+                    veshje.getVeshjaId(),
+                    veshje.getEmri(),
+                    veshje.getCmimiQirasePerDite(),
+                    veshje instanceof Kostum ? ((Kostum) veshje).getNgjyra() : "",
+                    veshje instanceof FustanNuserie ? ((FustanNuserie) veshje).getMateriali() : "",
+                    veshje instanceof FustanEventi ? ((FustanEventi) veshje).getGjatesia() : "",
+                    veshje.eshteEDisponueshme() ? "Po" : "Jo",
+                    "Rezervo"
+            });
+        }
     }
 
     private void showVeshjetDetails(ActionEvent e) {
@@ -67,85 +81,36 @@ public class ClientPanel extends JPanel {
         JOptionPane.showMessageDialog(this, builder.toString(), "Veshjet Disponueshme", JOptionPane.INFORMATION_MESSAGE);
     }
 
-    // New method to update the client table
-    private void updateClientTable(ActionEvent e) {
-        DefaultTableModel tableModel = (DefaultTableModel) ((JTable) ((JScrollPane) getComponent(1)).getViewport().getView()).getModel();
-        tableModel.setRowCount(0); // Clear the current table
-        populateKlientTable(tableModel); // Re-populate with the latest client data
-    }
+    private void rezervoVeshje(int row) {
+        int veshjeId = (int) veshjeTable.getValueAt(row, 0);
+        Veshje veshje = sherbimi.getVeshjeById(veshjeId);
 
-    private void populateKlientTable(DefaultTableModel tableModel) {
-        List<Klienti> klientList = sherbimi.getTeGjitheKlientet();
-        for (Klienti klient : klientList) {
-            boolean kaQiraAktive = klient.hasActiveRental();
-            tableModel.addRow(new Object[]{
-                    klient.getId(),
-                    klient.getEmri(),
-                    klient.getKontakt(),
-                    kaQiraAktive ? "Po" : "Jo",
-                    "Shiko Detajet",
-                    "Shto Qera",
-                    "Paguaj Qera",
-                    "Mbyll Qerane"
-            });
-        }
-    }
+        if (veshje != null && veshje.eshteEDisponueshme()) {
+            String klientIdStr = JOptionPane.showInputDialog(this, "Jep ID e Klientit:");
+            int klientId = Integer.parseInt(klientIdStr);
+            Klienti klient = sherbimi.getKlientById(klientId);
 
-    private void shikoDetajetQira(int klientId) {
-        Klienti klient = sherbimi.getKlientById(klientId);
-        if (klient.hasActiveRental()) {
-            Veshje veshja = sherbimi.getVeshjeById(klient.getRentedVeshjeId());
-            String message = String.format("Klienti ka qira aktive:\nVeshje: %s\nData e fillimit: %s\nData e mbarimit: %s",
-                    veshja.toString(), sherbimi.getRentalStartDate(klientId), sherbimi.getRentalEndDate(klientId));
-            JOptionPane.showMessageDialog(this, message);
-        } else {
-            JOptionPane.showMessageDialog(this, "Klienti nuk ka qira aktive.");
-        }
-    }
+            if (klient != null && !klient.hasActiveRental()) {
+                String dataFillimitStr = JOptionPane.showInputDialog(this, "Jep Datën e Fillimit (yyyy-MM-dd):");
+                String dataMbarimitStr = JOptionPane.showInputDialog(this, "Jep Datën e Mbarimit (yyyy-MM-dd):");
+                String paguarStr = JOptionPane.showInputDialog(this, "Paguar (po/jo):");
 
-    private void shtoQera(int klientId) {
-        Klienti klient = sherbimi.getKlientById(klientId);
-        if (!klient.hasActiveRental()) {
-            String veshjeIdStr = JOptionPane.showInputDialog("Jep ID e Veshjes për qira:");
-            int veshjeId = Integer.parseInt(veshjeIdStr);
-            Veshje veshja = sherbimi.getVeshjeById(veshjeId);
-            if (veshja != null && veshja.eshteEDisponueshme()) {
-                sherbimi.shtoQira(klientId, veshjeId);
-                JOptionPane.showMessageDialog(this, "Qira u shtua me sukses.");
+                LocalDate dataFillimit = LocalDate.parse(dataFillimitStr, DateTimeFormatter.ISO_LOCAL_DATE);
+                LocalDate dataMbarimit = LocalDate.parse(dataMbarimitStr, DateTimeFormatter.ISO_LOCAL_DATE);
+                boolean paguar = "po".equalsIgnoreCase(paguarStr);
+
+                // Rezervo veshjen dhe përditëso statusin
+                veshje.merreMeQira();
+                klient.setActiveRental(true, veshjeId);
+                sherbimi.shtoQira(klientId, veshjeId, dataFillimit, dataMbarimit, paguar); // Assumes shtoQira method is updated to include dates and payment status
+
+                loadVeshje(sherbimi.getTeGjithaVeshjet());
+                JOptionPane.showMessageDialog(this, "Veshja u rezervua me sukses.");
             } else {
-                JOptionPane.showMessageDialog(this, "Veshja nuk është e disponueshme.");
+                JOptionPane.showMessageDialog(this, "Klienti ka qira aktive ose nuk ekziston.");
             }
         } else {
-            JOptionPane.showMessageDialog(this, "Klienti ka qira aktive dhe nuk mund të shtohet një e re.");
-        }
-    }
-
-    private void paguajQera(int klientId) {
-        Klienti klient = sherbimi.getKlientById(klientId);
-        if (klient.hasActiveRental()) {
-            Veshje veshja = sherbimi.getVeshjeById(klient.getRentedVeshjeId());
-            double rentalPrice = veshja.getCmimiQirasePerDite();
-            int days = sherbimi.calculateRentalDays(klientId);
-            double totalAmount = rentalPrice * days;
-            int confirm = JOptionPane.showConfirmDialog(this,
-                    String.format("ID e qirasë: %d\nTotali për pagesë: %.2f €\nDëshironi të paguani?", klient.getRentedVeshjeId(), totalAmount),
-                    "Paguaj Qira", JOptionPane.YES_NO_OPTION);
-            if (confirm == JOptionPane.YES_OPTION) {
-                sherbimi.paguajQira(klientId);
-                JOptionPane.showMessageDialog(this, "Pagesa u krye me sukses.");
-            }
-        } else {
-            JOptionPane.showMessageDialog(this, "Klienti nuk ka qira aktive.");
-        }
-    }
-
-    private void mbyllQerane(int klientId) {
-        Klienti klient = sherbimi.getKlientById(klientId);
-        if (klient.hasActiveRental()) {
-            sherbimi.mbyllQira(klientId);
-            JOptionPane.showMessageDialog(this, "Qira u mbyll me sukses.");
-        } else {
-            JOptionPane.showMessageDialog(this, "Klienti nuk ka qira aktive.");
+            JOptionPane.showMessageDialog(this, "Veshja nuk është e disponueshme.");
         }
     }
 
@@ -165,16 +130,20 @@ public class ClientPanel extends JPanel {
         private JButton button;
         private String label;
         private boolean isPushed;
+        private int row;
+        private Consumer<Integer> action;
 
-        public ButtonEditor(JButton button) {
-            super(new JCheckBox());
-            this.button = button;
-            this.button.setOpaque(true);
-            this.button.addActionListener(e -> fireEditingStopped());
+        public ButtonEditor(JCheckBox checkBox, Consumer<Integer> action) {
+            super(checkBox);
+            this.action = action;
+            button = new JButton();
+            button.setOpaque(true);
+            button.addActionListener(e -> fireEditingStopped());
         }
 
         @Override
         public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
+            this.row = row;
             label = (value == null) ? "" : value.toString();
             button.setText(label);
             isPushed = true;
@@ -184,7 +153,7 @@ public class ClientPanel extends JPanel {
         @Override
         public Object getCellEditorValue() {
             if (isPushed) {
-                JOptionPane.showMessageDialog(button, label + " clicked");
+                action.accept(row);
             }
             isPushed = false;
             return label;

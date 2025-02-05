@@ -35,6 +35,7 @@ public abstract class Veshje implements Serializable {
         return emri;
     }
 
+
     public double getCmimiQirasePerDite() {
         return cmimiQirasePerDite;
     }
@@ -47,5 +48,17 @@ public abstract class Veshje implements Serializable {
     public String toString() {
         return "ID: " + veshjaId + ", Emri: " + emri + ", Lloji: " + lloji + ", Madhësia: " + madhesia + ", Çmimi: " + cmimiQirasePerDite + "€/dita" +
                 ", Disponueshmëria: " + (eshteEDisponueshme ? "Po" : "Jo");
+    }
+
+    public void setEmri(String newEmri) {
+        emri = newEmri;
+    }
+
+    public void setCmimiQirasePerDite(double newCmimi) {
+        cmimiQirasePerDite = newCmimi;
+    }
+
+    public void setEDisponueshme(boolean eDisponueshme) {
+        eshteEDisponueshme = eDisponueshme;
     }
 }
