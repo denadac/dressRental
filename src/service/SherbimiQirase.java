@@ -9,24 +9,22 @@ public class SherbimiQirase {
     private List<Klienti> klientet;
 
     public SherbimiQirase() {
-        // Load existing Veshje from file on startup
         this.veshjet = MenaxhuesiSkedareve.lexoVeshje();
-        this.klientet = new ArrayList<>();
+        this.klientet = MenaxhuesiSkedareve.lexoKlientet();
     }
 
-    // Adds a new Veshje and saves it to file
     public void shtoVeshje(Veshje veshje) {
         veshjet.add(veshje);
         MenaxhuesiSkedareve.ruajVeshje(veshjet);
         System.out.println("✅ Veshja u shtua dhe u ruajt!");
     }
 
-    // Adds a new Klienti
     public void shtoKlient(Klienti klient) {
         klientet.add(klient);
+        MenaxhuesiSkedareve.ruajKlientet(klientet);
+        System.out.println("✅ Klienti u shtua dhe u ruajt!");
     }
 
-    // Returns available Veshje
     public List<Veshje> shikoVeshjetDisponueshme() {
         List<Veshje> teDisponueshme = new ArrayList<>();
         for (Veshje v : veshjet) {
@@ -37,8 +35,11 @@ public class SherbimiQirase {
         return teDisponueshme;
     }
 
-    // Returns all Veshje (not just available ones)
     public List<Veshje> getTeGjithaVeshjet() {
         return new ArrayList<>(veshjet);
+    }
+
+    public List<Klienti> getTeGjitheKlientet() {
+        return new ArrayList<>(klientet);
     }
 }
